@@ -1,0 +1,54 @@
+2-Day Cypress Learning Roadmap (With Hands-On Practice)
+Day 1: Cypress Fundamentals & Basic Automation
+✅ Setup & Installation
+
+Install Node.js (if not installed).
+Install Cypress (npm install cypress --save-dev).
+Open Cypress (npx cypress open).
+✅ Understanding Cypress Architecture
+
+How Cypress works vs. Selenium (no WebDriver, direct DOM interaction).
+Cypress Test Runner UI.
+✅ Writing Your First Cypress Test
+
+Visit a webpage (cy.visit()).
+Find and interact with elements (cy.get(), .type(), .click()).
+Assertions (should(), contains()).
+Running tests in headed/headless mode.
+✅ Working with Locators & Interactions
+
+Selecting elements (get(), contains(), find()).
+Handling inputs, buttons, and links.
+Custom commands (Cypress.Commands.add).
+✅ Practice: Automate Login & Navigation
+
+Create a test to log in to a web app.
+Validate redirection and UI elements after login.
+Day 2: Advanced Cypress & POM Implementation
+✅ Cypress with Page Object Model (POM)
+
+Create a separate file for page objects.
+Store locators and methods for reusability.
+Import POM in test files.
+✅ Working with Fixtures & Data-driven Testing
+
+Use fixtures to store test data (like Excel).
+Read JSON data and use it in tests.
+Use cy.readFile() for external data sources.
+✅ Handling API Requests & UI Synchronization
+
+Mock API responses (cy.intercept()).
+Wait for network requests (cy.wait()).
+✅ End-to-End Automation Practice
+
+Automate a complete user journey (Login → Form Fill → Validation).
+Read test data from an Excel file (use xlsx package).
+Implement dynamic waits and retries.
+Outcome: By the End of Day 2
+You will have a fully automated Cypress project.
+You will be able to implement POM & read data from an external file.
+You will understand Cypress's unique features like auto-waiting & API mocking.
+Next Steps (Optional, if time permits)
+Run tests in different browsers (cypress run --browser chrome).
+Continuous Integration (CI) setup with GitHub Actions.
+Cypress Dashboard integration for reporting.
