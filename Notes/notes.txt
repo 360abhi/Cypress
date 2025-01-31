@@ -1,0 +1,91 @@
++---------------------------+
+| Cypress Test Runner       |  🖥️ Runs inside the browser
+| - Executes commands       |
+| - Hooks into DOM          |
+| - Listens to events       |
++---------------------------+
+         ⬇️ WebSocket Communication
++---------------------------+
+| Cypress Backend (Node.js) |  💻 Runs outside the browser
+| - Handles files, logging  |
+| - Manages configs         |
+| - Runs external plugins   |
++---------------------------+
+
+Cypress commands (cy.visit(), cy.get(), etc.) are asynchronous, but Cypress does not use JavaScript promises directly. Instead, Cypress has its own command queue that ensures commands run in order.
+Cypress commands don’t return values immediately like promises. Instead, Cypress automatically chains commands together.
+
+We can use object destructuring while passing parameters in function where we want to pass in our order not the default one.
+
+✅ Cypress Basics
+Cypress Setup:
+
+Installed Cypress and configured it with Node.
+Familiarized with Cypress UI (npx cypress open).
+Cypress Configuration: You learned how to set configurations like video recording and screenshots in the cypress.config.js file.
+Cypress Commands:
+
+describe and it blocks to structure tests.
+Common Cypress commands like cy.visit(), cy.get(), cy.click(), and cy.type().
+Understanding the Chai assertions (.should(), .contains(), .be.visible, etc.).
+Running Tests:
+
+Running tests using npx cypress run in headless mode.
+Running a specific test file with --spec.
+Running tests in headed mode (--headed).
+Enabling video recording (--video).
+Generate Mochawesome reports.
+Running tests with custom configuration like baseUrl, timeouts, retries, etc.
+Page Object Model (POM):
+
+Created POM classes to structure your tests by defining elements (XPath or CSS selectors) and actions (methods).
+Used the export default pattern for sharing classes and calling methods from the test scripts.
+Troubleshooting:
+
+Handled issues like element visibility and commands that sometimes failed to find elements.
+Understood how to deal with waiting for elements and timeouts.
+Test Reports & Screenshots:
+
+You learned how to enable screenshots and videos for every test run.
+Configured test reporting with the Mochawesome reporter.
+✅ Key Cypress Commands Reviewed:
+npx cypress open — Opens the Cypress UI.
+npx cypress run — Runs tests in headless mode.
+npx cypress run --spec "path/to/test-file.cy.js" — Runs a specific test file.
+npx cypress run --headed — Runs tests in headed mode.
+cy.get('selector') — Retrieves DOM elements.
+cy.click() — Clicks on elements.
+cy.type() — Types into form fields.
+cy.visit() — Navigates to a webpage.
+cy.xpath() — Queries elements using XPath (with cypress-xpath plugin).
+cy.should() — Used for assertions (e.g., visibility checks).
+cy.screenshot() — Takes a screenshot.
+cy.wait() — Waits for elements or network requests.
+What You’ve Mastered So Far:
+Basic structure of Cypress tests.
+How to interact with elements and assert conditions.
+Setting up configuration options like videos, reports, and screenshots.
+Using Page Object Model (POM) to manage test scripts effectively.
+Running tests with specific configurations like --headed, --spec, and enabling video and report generation.
+Understanding Cypress architecture and test execution flow.
+
+BEFORE EACH: runs before every test
+beforeEach() is a hook in Cypress that allows you to run some code before each test (it) in a test suite (describe). It’s commonly used to set up preconditions or repeat actions that you want to perform before every test.
+
+describe('Login Tests', () => {
+  // This will run before each test
+  beforeEach(() => {
+    cy.visit('https://example.com/login');  // Visit the login page
+    cy.get('input[name="username"]').type('validUser');  // Type username
+    cy.get('input[name="password"]').type('validPass');  // Type password
+    cy.get('button[type="submit"]').click();  // Click login
+  });
+
+  it('should login successfully', () => {
+    cy.url().should('include', '/dashboard');  // Assert that the URL includes 'dashboard'
+  });
+
+  it('should show the user dashboard', () => {
+    cy.get('.dashboard').should('be.visible');  // Assert that the dashboard is visible
+  });
+});

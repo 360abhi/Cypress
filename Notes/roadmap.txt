@@ -44,10 +44,13 @@ Wait for network requests (cy.wait()).
 Automate a complete user journey (Login → Form Fill → Validation).
 Read test data from an Excel file (use xlsx package).
 Implement dynamic waits and retries.
+
 Outcome: By the End of Day 2
 You will have a fully automated Cypress project.
 You will be able to implement POM & read data from an external file.
 You will understand Cypress's unique features like auto-waiting & API mocking.
+
+
 Next Steps (Optional, if time permits)
 Run tests in different browsers (cypress run --browser chrome).
 Continuous Integration (CI) setup with GitHub Actions.

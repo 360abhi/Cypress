@@ -1,0 +1,18 @@
+[
+    {
+        "username":"standard_user",
+        "password":"secret_sauce",
+        "url":"https://www.saucedemo.com/",
+        "firstname":"Abhishek",
+        "lastname":"chhawari",
+        "zipcode":"400005"
+    },
+    {
+        "username":"standard_user",
+        "password":"secret_sauce",
+        "url":"https://www.saucedemo.com/",
+        "firstname":"Ankit",
+        "lastname":"Yadav",
+        "zipcode":"123401"
+    }
+]
