@@ -89,3 +89,18 @@ describe('Login Tests', () => {
     cy.get('.dashboard').should('be.visible');  // Assert that the dashboard is visible
   });
 });
+
+
+
+
+🔹 Understanding cy.task() in Cypress
+cy.task() is used to execute Node.js code outside of the browser environment.
+Cypress runs tests inside the browser, but sometimes we need to:
+✅ Read/write files (e.g., JSON, CSV, logs)
+✅ Connect to a database
+✅ Execute shell commands
+✅ Call external APIs before or after tests
+🔹 How it Works
+You define a task function inside setupNodeEvents() in cypress.config.js.
+Inside your test file (.cy.js), you call cy.task('taskName'), and Cypress runs it in Node.js (outside the browser).
+The result is returned as a Promise, so you must use .then() to handle it.
