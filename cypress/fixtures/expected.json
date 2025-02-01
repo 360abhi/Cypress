@@ -1,0 +1,33 @@
+[
+    {
+      "uid": "1",
+      "name": "Product A",
+      "price": 100,
+      "quantity": 2
+    },
+    {
+      "uid": "2",
+      "name": "Product B",
+      "price": 200,
+      "quantity": 3
+    },
+    {
+      "uid": "3",
+      "name": "Product C",
+      "price": 300,
+      "quantity": 4
+    },
+    {
+      "uid": "4",
+      "name": "Product D",
+      "price": 150,
+      "quantity": 5
+    },
+    {
+      "uid": "5",
+      "name": "Product E",
+      "price": 250,
+      "quantity": 6
+    }
+  ]
+  
