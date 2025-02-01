@@ -104,3 +104,11 @@ Cypress runs tests inside the browser, but sometimes we need to:
 You define a task function inside setupNodeEvents() in cypress.config.js.
 Inside your test file (.cy.js), you call cy.task('taskName'), and Cypress runs it in Node.js (outside the browser).
 The result is returned as a Promise, so you must use .then() to handle it.
+
+
+
+🔥 Final Summary
+Scenario	Cypress Command Needed?	Why?
+cy.get('.title').invoke('text')	❌ No wrap needed	cy.get() returns a jQuery object, which supports .invoke().
+cy.get('.title').each(el => el.invoke('text'))	❌ Will fail	el is a raw DOM element (not a Cypress command).
+cy.get('.title').each(el => cy.wrap(el).invoke('text'))	✅ Wrap needed	cy.wrap(el) converts el into a Cypress command, making .invoke() work.

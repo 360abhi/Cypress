@@ -15,27 +15,28 @@ module.exports = defineConfig({
         },
 
         // Function to read json data
-        readJson(){
+        readJsonData(){
           const data = fs.readFileSync('cypress/fixtures/testdata.json','utf-8');
           return JSON.parse(data)
         }, 
 
-        // Function to clean database
-        cleanDatabase(){
-          return 'Database Cleaned';
+        // Function to Store data in Json
+        saveJsonData(data){
+          fs.writeFileSync('cypress/logs/scraped.json',JSON.stringify(data,null,2));
+          return null
         }
 
 
-      })
+      });
     },
-    video: true, // Enables video recording
-    screenshotOnRunFailure: true, // Take a screenshot when a test fails
+    video: false, // Enables video recording
+    screenshotOnRunFailure: false, // Take a screenshot when a test fails
     reporter: 'mochawesome',  // Specify Mochawesome as the reporter
     reporterOptions: {
       reportDir: 'cypress/reports',  // Custom folder for the report
-      overwrite: false,
-      html: true,
-      json: true,
+      overwrite: true,
+      html: false,
+      json: false,
     }
   },
 });
