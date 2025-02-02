@@ -24,7 +24,6 @@ export class LoginPage {
         this.visit(url)
         this.enterUsername(uname)
         this.enterPasswrod(paswd)
-        cy.pause()
         this.clickLogin()
     }
 
