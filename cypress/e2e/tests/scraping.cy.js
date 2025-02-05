@@ -1,12 +1,12 @@
 describe('Scraping Suite',()=>{
-    it('Simple Scrape',()=>{
+    it.skip('Simple Scrape',()=>{
         cy.visit('https://sauce-demo.myshopify.com/')
         cy.xpath("//a[@class='checkout']").invoke('text').then((text)=>{
             cy.task('writeLog',text);
-        })
+        });
     });
 
-    it('Scraping multiple',()=>{
+    it.skip('Scraping multiple',()=>{
         cy.visit('https://sauce-demo.myshopify.com/');
         let userdata = []
 
@@ -16,7 +16,7 @@ describe('Scraping Suite',()=>{
             })
         }).then(()=>{
             cy.task('saveJsonData',userdata)
-        })
-    })
+        });
+    });
 });
 

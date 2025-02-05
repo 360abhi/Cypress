@@ -112,3 +112,16 @@ Scenario	Cypress Command Needed?	Why?
 cy.get('.title').invoke('text')	❌ No wrap needed	cy.get() returns a jQuery object, which supports .invoke().
 cy.get('.title').each(el => el.invoke('text'))	❌ Will fail	el is a raw DOM element (not a Cypress command).
 cy.get('.title').each(el => cy.wrap(el).invoke('text'))	✅ Wrap needed	cy.wrap(el) converts el into a Cypress command, making .invoke() work.
+
+
+API ---------------->
+The API is slow or unreliable.
+You don’t want to hit a real backend while testing.
+You need to test edge cases (e.g., server errors).
+
+Mocking:
+Replacing an actual API response with a fake response.
+Helps in testing frontend behavior without depending on the real backend.
+Stubbing:
+Intercepting a network request and replacing it with custom data.
+Can simulate different API scenarios like success, failure, or delays.

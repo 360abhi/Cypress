@@ -25,8 +25,6 @@ module.exports = defineConfig({
           fs.writeFileSync('cypress/logs/scraped.json',JSON.stringify(data,null,2));
           return null
         }
-
-
       });
     },
     video: false, // Enables video recording
@@ -35,8 +33,8 @@ module.exports = defineConfig({
     reporterOptions: {
       reportDir: 'cypress/reports',  // Custom folder for the report
       overwrite: true,
-      html: false,
-      json: false,
+      html: true,
+      json: true,
     }
   },
 });
