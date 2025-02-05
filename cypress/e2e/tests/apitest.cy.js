@@ -55,7 +55,7 @@ describe("API suite",()=>{
                             "value": "018-31-2442"
                         },
                         "picture": {
-                            "large": "https://randomuser.me/api/portraits/men/42.jpg",
+                            "large": "https://randomuser.me/api/portraits/men/41.jpg",
                             "medium": "https://randomuser.me/api/portraits/med/men/42.jpg",
                             "thumbnail": "https://randomuser.me/api/portraits/thumb/men/42.jpg"
                         },
@@ -75,5 +75,17 @@ describe("API suite",()=>{
         cy.wait('@getUser'); // Wait for the intercepted request
 
         cy.get('#user_value').should('include.text','Abhishek')
+    });
+
+    it.skip('Internal Server Error Test', () => {
+        cy.intercept('GET','https://randomuser.me/api/?nat=us&randomapi',{
+            statusCode:500
+        }).as('getUserError');
+
+        cy.visit('https://randomuser.me/'); 
+        cy.wait('@getUserError');
+        
+        cy.get("#user_value").should('include.text','...');
+        cy.log('Server Error');
     });
 });
