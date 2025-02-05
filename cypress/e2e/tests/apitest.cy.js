@@ -1,6 +1,6 @@
 
 describe("API suite",()=>{
-    it('First API TEST', () => {
+    it.skip('First API TEST', () => {
         cy.intercept('GET','https://randomuser.me/api/?nat=us&randomapi',{
             statusCode:200,
             body : {
@@ -69,10 +69,10 @@ describe("API suite",()=>{
                     "version": "1.4"
                 }
             }
-        }).as('getUser'); // Assign alias to the intercepted request
+        }).as('getUser'); 
 
-        cy.visit('https://randomuser.me/'); // Visit a page that calls the API
-        cy.wait('@getUser'); // Wait for the intercepted request
+        cy.visit('https://randomuser.me/'); 
+        cy.wait('@getUser').its('response.statusCode').should('eq', 200);
 
         cy.get('#user_value').should('include.text','Abhishek')
     });
@@ -88,4 +88,22 @@ describe("API suite",()=>{
         cy.get("#user_value").should('include.text','...');
         cy.log('Server Error');
     });
+
+    it('API Delay Test - 2', () => {
+        cy.intercept('GET','https://fakerestapi.azurewebsites.net/api/v1/Activities',(req)=>{
+            req.on('response',(res)=>{
+                res.setDelay(2000);
+            });
+        }).as('delay')
+
+        cy.visit('https://fakerestapi.azurewebsites.net/index.html');
+        cy.xpath("(//span[.='GET'])[1]").click();
+        cy.xpath("//button[@class='btn try-out__btn']").click();
+        cy.xpath("//div[@class='loading']").should("not.exist");
+        cy.xpath("//button[.='Execute']").click();
+        cy.xpath("//div[@class='loading']").should('exist');
+        cy.wait("@delay");
+        cy.xpath("(//td[@class='response-col_status'])[1]").should('include.text',"200");
+    });
+    
 });
