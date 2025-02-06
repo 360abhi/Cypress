@@ -1,30 +1,38 @@
-FROM node:20  
+# Use an official Node.js runtime as the base image
+FROM node:18-bullseye
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install Cypress dependencies
-RUN apt-get update && apt-get install -y \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    libgbm1 \
-    libasound2 \
-    libpangocairo-1.0-0 \
-    libpango-1.0-0 \
+# Install system dependencies required for Cypress and browsers
+RUN apt-get update && \
+    apt-get install -y \
+    libgtk2.0-0 \
     libgtk-3-0 \
-    && rm -rf /var/lib/apt/lists/*
+    libgbm-dev \
+    libnotify-dev \
+    libgconf-2-4 \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    xauth \
+    xvfb \
+    # Clean up to reduce image size
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json (or yarn.lock)
+COPY package*.json ./
+
+# Install Node.js dependencies
 RUN npm install
 
-# Copy rest of the project
+# Copy the rest of the application code
 COPY . .
 
-# Run Cypress in headless mode
-CMD ["npx", "cypress", "run", "--headless"]
+# Set environment variables for Cypress
+# ENV CYPRESS_CACHE_FOLDER=/app/.cache/Cypress
+
+# Run Cypress tests
+CMD ["npx", "cypress", "run"]

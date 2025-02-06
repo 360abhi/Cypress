@@ -125,3 +125,116 @@ Helps in testing frontend behavior without depending on the real backend.
 Stubbing:
 Intercepting a network request and replacing it with custom data.
 Can simulate different API scenarios like success, failure, or delays.
+
+Parameters:
+Parameter	Description	Example
+method:	The HTTP method to intercept (GET, POST, PUT, DELETE, etc.).	'GET', 'POST'
+url:	The API endpoint (can be full or partial match using wildcards).	'/api/users', '*api*'
+response:	The mock response, can be an object ({}) or a function (req) => {}	{statusCode: 200, body: { name: 'John' } }
+
+
+ Summary: What Can cy.intercept() Do?
+✅ Mock API Responses → Return custom responses without calling the real server.
+✅ Simulate API Failures → Test how UI handles 500, 400, or timeout errors.
+✅ Modify Requests Dynamically → Change request/response data in real-time.
+✅ Test Slow Networks → Simulate delay using setDelay().
+✅ Intercept and Modify Any HTTP Method → GET, POST, PUT, DELETE, etc.
+
+🚀 This allows Cypress to test frontend behavior without relying on real APIs! 🚀
+
+🔍 req.reply() vs. Direct Response
+Approach	Flexibility	When to Use
+Direct Response (without a function)	✅ Simple and quick	When the response is always static
+req.reply(callback) (with a function)	✅ Dynamic control over response	When you need to modify response based on request details
+
+cy.intercept('GET', '/api/users', (req) => {
+    req.reply((res) => {
+        res.send({
+            statusCode: 200,
+            body: [{ id: 1, name: 'John Doe', time: new Date().toISOString() }]
+        });
+    });
+}).as('dynamicUsers');
+
+
+------------------
+req.reply is alwasy used to modify the UI req
+for post req sent to server modify use: req.body and send payload to it
+
+---posts-----
+When you intercept a POST request and want to inspect the response data, you will always use cy.wait() and then use .then() to access the interception. Here's why:
+
+🎯 Why cy.wait() and then() are used with cy.intercept()
+cy.wait(): It's needed to wait for the network request to complete before you proceed with your assertions or any other operations. The @ alias ensures that you're specifically waiting for that request (POST in this case).
+
+.then(): You use this method to handle the interception object returned by the cy.wait(). This allows you to extract and work with interception.response.body or other response data.
+
+deep_equal : inteception.request.body and interception.response.body
+
+@@@@ Assertions in API
+1. Status Code Assertions
+Verify the HTTP status code (e.g., 200, 201, 400, 401, 404, 500).
+
+2. Response Header Assertions
+Check for specific headers (e.g., content-type, authorization).
+
+Verify header values (e.g., application/json, Bearer token).
+
+3. Response Body Assertions
+Check if a property exists in the response.
+
+Verify the value of a specific property.
+
+Validate the data type of a property (e.g., string, number, boolean).
+
+Check for nested properties in the response.
+
+Verify the length of an array in the response.
+
+Check if an array contains a specific object.
+
+Validate partial matches in the response body.
+
+Verify if a property value exists in an array.
+
+4. Response Time Assertions
+Ensure the response time is within an acceptable limit.
+
+5. Error Response Assertions
+Verify error messages in the response.
+
+Check error codes or statuses.
+
+Validate error details or descriptions.
+
+6. Pagination Assertions
+Verify pagination properties (e.g., page, pageSize, totalItems).
+
+Check the length of the items array in paginated responses.
+
+7. Schema Validation Assertions
+Validate the response structure against a predefined schema.
+
+8. Dynamic Data Assertions
+Check if dynamic properties (e.g., IDs, timestamps) exist.
+
+Validate dynamic values against patterns (e.g., email, UUID).
+
+Verify if timestamps are recent or match expected formats.
+
+9. Request Payload Assertions
+Verify the request payload sent to the API matches expectations.
+
+10. Query Parameter Assertions
+Check if query parameters in the request are correct.
+
+11. Authentication Assertions
+Verify authentication headers (e.g., Authorization: Bearer token).
+
+12. Response Size Assertions
+Check the size of the response body (e.g., array length, byte size).
+
+13. Empty Response Assertions
+Verify if the response body is empty.
+
+--------------------------------
