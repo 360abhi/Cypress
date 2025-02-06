@@ -1,15 +1,20 @@
 pipeline {
-    agent {
-        docker {
-            image 'cypress-tests'
-            args '-v $WORKSPACE:/app'
-        }
-    }
+    agent any
 
     stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t cypress-tests .'
+                }
+            }
+        }
+
         stage('Run Cypress Tests') {
             steps {
-                sh 'npx cypress run'
+                script {
+                    sh 'docker run --rm cypress-tests'
+                }
             }
         }
 
