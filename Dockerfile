@@ -31,8 +31,5 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Set environment variables for Cypress
-# ENV CYPRESS_CACHE_FOLDER=/app/.cache/Cypress
-
 # Run Cypress tests
 CMD ["npx", "cypress", "run"]

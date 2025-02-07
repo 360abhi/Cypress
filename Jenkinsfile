@@ -1,13 +1,14 @@
 pipeline {
-    agent {
-        docker {
-            image 'cypress-tests'
-            args '-v $WORKSPACE:/app'
-        }
-    }
+    agent any
 
     stages {
         stage('Run Cypress Tests') {
+            agent {
+                docker {
+                    image 'notmynameab/cypress_test:latest' // Replace with your public Docker image
+                    args '-v $WORKSPACE:/app'
+                }
+            }
             steps {
                 sh 'npx cypress run'
             }
