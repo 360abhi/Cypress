@@ -1,7 +1,0 @@
-Step-by-Step Documentation
-1. Create Cypress Tests
-You created Cypress tests for your project. This involves:
-
-Writing test cases in the cypress/e2e directory.
-
-Adding necessary dependencies in package.json.

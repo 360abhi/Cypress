@@ -1,3 +1,162 @@
+
+Step-by-Step Documentation
+1. Create Cypress Tests
+You created Cypress tests for your project. This involves:
+    • Writing test cases in the cypress/e2e directory.
+    • Adding necessary dependencies in package.json.
+2. Create a Dockerfile for Cypress Tests
+You created a Dockerfile to containerize your Cypress tests. Here’s an example Dockerfile
+# Use an official Node.js runtime as the base image
+FROM node:18-bullseye
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Install system dependencies required for Cypress and browsers
+RUN apt-get update && \
+    apt-get install -y \
+    libgtk2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libnotify-dev \
+    libgconf-2-4 \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    xauth \
+    xvfb \
+    # Clean up to reduce image size
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy package.json and package-lock.json (or yarn.lock)
+COPY package*.json ./
+
+# Install Node.js dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Run Cypress tests
+CMD ["npx", "cypress", "run"]
+
+
+Build the Docker image: 
+docker build -t notmynameab/cypress_test:latest .
+
+3. Create a Jenkins Image with Docker CLI Installed
+You created a custom Jenkins image with Docker CLI installed. Here’s how:
+# Use the official Jenkins LTS image as the base image
+FROM jenkins/jenkins:lts
+
+# Switch to root user to install Docker
+USER root
+
+# Install Docker CLI
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+RUN apt-get update && apt-get install -y docker-ce-cli
+
+
+
+
+----------
+Run jenkins image
+docker run -d \
+  --name jenkins \
+  -p 8080:8080 \
+  -p 50000:50000 \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  custom-jenkins:latest
+
+Push cypress image to docker hub
+docker tag notmynameab/cypress_test:latest notmynameab/cypress_test:latest
+docker push notmynameab/cypress_test:latest
+
+open jenkins localhost and create a job
+configure pipeline:
+pipeline {
+    agent any
+
+    stages {
+        stage('Pull Cypress Docker Image') {
+            steps {
+                script {
+                    // Pull the Docker image from Docker Hub
+                    sh 'docker pull notmynameab/cypress_test:latest'
+                }
+            }
+        }
+
+        stage('Run Cypress Tests') {
+            steps {
+                script {
+                    // Run the Cypress tests inside the Docker container
+                    sh 'docker run --rm notmynameab/cypress_test:latest npx cypress run'
+                }
+            }
+        }
+
+        stage('Archive Test Results') {
+            steps {
+                // Archive the test results (if applicable)
+                archiveArtifacts artifacts: '**/cypress/reports/**/*', allowEmptyArchive: true
+            }
+        }
+    }
+}
+
+-------------------
+Alternative
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm // Checks out the code from GitHub
+            }
+        }
+
+        stage('Run Cypress Tests') {
+            agent {
+                docker {
+                    image 'cypress/included:12.17.0' // Official Cypress image
+                    args '-v $WORKSPACE:/app' // Mount the workspace
+                }
+            }
+            steps {
+                sh '''
+                    cd /app
+                    npm install # Install dependencies
+                    npx cypress run # Run Cypress tests
+                '''
+            }
+        }
+
+        stage('Archive Test Results') {
+            steps {
+                archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
+            }
+        }
+    }
+}
+
+
+=========Notes:
 +---------------------------+
 | Cypress Test Runner       |  🖥️ Runs inside the browser
 | - Executes commands       |
@@ -238,3 +397,183 @@ Check the size of the response body (e.g., array length, byte size).
 Verify if the response body is empty.
 
 --------------------------------
+Dynamic URL:
+
+Dynamic URLs are URLs that change based on user input, application state, or database content. Examples include:
+
+URLs with IDs: /products/123
+
+URLs with slugs: /blog/my-first-post
+
+URLs with query parameters: /search?q=cypress
+
+1. Intercepting Dynamic URLs with Wildcards
+You can use wildcards (*) in cy.intercept() to match dynamic URLs.
+
+Example Scenario:
+You have a dynamic URL like /api/products/123, where 123 is a product ID.
+
+You want to intercept this URL and mock the response.
+
+1. Directly passing the response object inside cy.intercept() without a callback function:
+This method is the most straightforward and concise. You can pass the response directly as an object inside the cy.intercept() method without using the req.reply() callback.
+
+2. Using req.reply() and passing the response directly inside the callback:
+This method provides more flexibility and allows you to perform custom logic on the request or modify the response before sending it back.
+
+3. Using a callback function inside req.reply() and res.send():
+This method is useful if you want more fine-grained control over the response or need to perform asynchronous operations before sending the response. It uses the res.send() method to send the response.
+
+usecase of res.send :
+it('Conditional responses based on query params', () => {
+    cy.intercept('GET', 'https://example.com/api/items', (req) => {
+        const isSpecial = req.query.special === 'true'; // Check for query parameter
+        req.reply((res) => {
+            if (isSpecial) {
+                res.send({
+                    statusCode: 200,
+                    body: {
+                        id: '1',
+                        title: 'Special Item',
+                        dueDate: "2025-02-09T11:07:29.9358897+00:00",
+                        completed: true
+                    }
+                });
+            } else {
+                res.send({
+                    statusCode: 200,
+                    body: {
+                        id: '1',
+                        title: 'Regular Item',
+                        dueDate: "2025-02-09T11:07:29.9358897+00:00",
+                        completed: false
+                    }
+                });
+            }
+        });
+    }).as('dynamic');
+});
+
+==============HOOKS
+When to Use Each Hook:
+    1. before(): Use this when you need to run a piece of code once before any tests are run. Good for global setup (e.g., setting up a database, authenticating, or setting environment variables).
+        ◦ Example: Logging in a user before running all tests.
+    2. beforeEach(): Use this when you need to set up the environment before each individual test runs. This is useful when each test needs a clean state or specific actions, like visiting a page or clicking an element.
+        ◦ Example: Visiting the homepage, resetting state, or clearing cookies before each test.
+    3. after(): Use this when you need to perform actions after all tests have completed, such as cleaning up shared resources.
+        ◦ Example: Logging out the user, cleaning up test data, or disconnecting from external services after all tests run.
+    4. afterEach(): Use this when you need to perform actions after each individual test, such as resetting mock data, clearing session storage, or performing other cleanup tasks.
+        ◦ Example: Resetting any changes made during the test, clearing cookies, or verifying UI elements are cleaned up.
+describe('My Application Tests', () => {
+
+    before(() => {
+        // Run once before all tests
+        cy.log('Running global setup');
+        // Example: log in or set up initial state for the whole suite
+        cy.visit('/');
+    });
+
+    beforeEach(() => {
+        // Run before each test
+        cy.log('Preparing for individual test');
+        // Example: reset application state, visit a page, or log in if needed
+        cy.clearCookies(); // Clear cookies before each test
+        cy.visit('/');
+    });
+
+    it('should load the homepage', () => {
+        cy.log('Running test 1');
+        cy.contains('Welcome to the homepage').should('be.visible');
+    });
+
+    it('should check the login functionality', () => {
+        cy.log('Running test 2');
+        cy.get('button').contains('Login').click();
+        cy.url().should('include', '/login');
+    });
+
+    afterEach(() => {
+        // Run after each test
+        cy.log('Running cleanup after each test');
+        // Example: Reset state after each test, like clearing data or verifying UI
+    });
+
+    after(() => {
+        // Run once after all tests
+        cy.log('Running final cleanup after all tests');
+        // Example: log out, disconnect from services, or clean up external resources
+    });
+
+});
+
+
+/////////////PERSISTING SESSIONS
+1. Login Once and Persist Session Across Tests
+You can log in once and then use the session (cookies, local storage, or authentication tokens) across multiple tests. This is done by preserving cookies or local storage between tests.
+Steps:
+    1. Log in once and store the session details (cookies or local storage).
+    2. Use Cypress session commands (cy.session()) to persist the login state for subsequent tests.
+describe('Persistent Login', () => {
+
+    // Log in once and reuse the session across tests
+    beforeEach(() => {
+        cy.session('login', () => {
+            cy.visit('/login'); // visit the login page
+            cy.get('input[name="username"]').type('myusername');
+            cy.get('input[name="password"]').type('mypassword');
+            cy.get('button[type="submit"]').click(); // submit login form
+            // Assuming login redirects to the homepage, we can check if logged in
+            cy.url().should('include', '/home'); 
+        });
+    });
+
+    it('Test 1 - After Login', () => {
+        cy.visit('/dashboard');
+        cy.contains('Welcome').should('be.visible');
+    });
+
+    it('Test 2 - After Login', () => {
+        cy.visit('/profile');
+        cy.contains('User Profile').should('be.visible');
+    });
+});
+
+2. Using Cookies for Session Persistence
+Cypress can persist cookies across tests by reading the cookies from the first test and using them in subsequent tests. You can manually set cookies or preserve them.
+Example:
+    1. Login once and save cookies.
+    2. In subsequent tests, preserve cookies to maintain the logged-in state.
+describe('Persistent Login with Cookies', () => {
+
+    before(() => {
+        // Perform login and capture cookies
+        cy.visit('/login'); // visit the login page
+        cy.get('input[name="username"]').type('myusername');
+        cy.get('input[name="password"]').type('mypassword');
+        cy.get('button[type="submit"]').click(); // submit login form
+        cy.url().should('include', '/home'); // check redirection after login
+
+        // Capture cookies after login
+        cy.getCookies().then((cookies) => {
+            window.localStorage.setItem('myCookies', JSON.stringify(cookies)); // Store cookies in localStorage
+        });
+    });
+
+    beforeEach(() => {
+        // Retrieve cookies and set them before each test
+        const cookies = JSON.parse(window.localStorage.getItem('myCookies'));
+        cookies.forEach(cookie => {
+            cy.setCookie(cookie.name, cookie.value); // set the cookies
+        });
+    });
+
+    it('Test 1 - After Login', () => {
+        cy.visit('/dashboard');
+        cy.contains('Welcome').should('be.visible');
+    });
+
+    it('Test 2 - After Login', () => {
+        cy.visit('/profile');
+        cy.contains('User Profile').should('be.visible');
+    });
+});
