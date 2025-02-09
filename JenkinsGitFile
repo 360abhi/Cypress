@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm // Checks out the code from GitHub
+            }
+        }
+
+        stage('Run Cypress Tests') {
+            agent {
+                docker {
+                    image 'cypress/included:12.17.0' // Official Cypress image
+                    args '-v $WORKSPACE:/app' // Mount the workspace
+                }
+            }
+            steps {
+                sh '''
+                    cd /app
+                    npm install # Install dependencies
+                    npx cypress run # Run Cypress tests
+                '''
+            }
+        }
+
+        stage('Archive Test Results') {
+            steps {
+                archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
+            }
+        }
+    }
+}
